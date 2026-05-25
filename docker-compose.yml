@@ -7,10 +7,10 @@ services:
       POSTGRES_DB:       retailmax
       POSTGRES_USER:     retailmax
       POSTGRES_PASSWORD: retailmax123
-      POSTGRES_MULTIPLE_DATABASES: retailmax,metabase
+      PGDATA:            /var/lib/postgresql/data
     volumes:
       - ./init-scripts:/docker-entrypoint-initdb.d:ro
-      - ./postgres-data:/var/lib/postgresql/data
+      - ./postgres-data/pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
