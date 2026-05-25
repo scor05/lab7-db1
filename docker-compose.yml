@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: retailmax_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       retailmax
+      POSTGRES_USER:     retailmax
+      POSTGRES_PASSWORD: retailmax123
+      POSTGRES_MULTIPLE_DATABASES: retailmax,metabase
+    volumes:
+      - ./init-scripts:/docker-entrypoint-initdb.d:ro
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U retailmax -d retailmax"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: retailmax_metabase
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: retailmax
+      MB_DB_PASS: retailmax123
+      MB_DB_HOST: postgres
+      MB_ADMIN_EMAIL: calificar@uvg.edu.gt
+      MB_ADMIN_PASSWORD: secret123+
+      MB_ADMIN_FIRST_NAME: UVG
+      MB_ADMIN_LAST_NAME: UVG
+      JAVA_TIMEZONE: America/Guatemala
+    volumes:
+      - ./metabase-data:/metabase-data
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres-data:
